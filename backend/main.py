@@ -3,11 +3,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import JSONFormatter
 from pydantic import BaseModel
+import requests
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+proxies = {
+    "http": "http://51.158.123.35:8811",
+    "https": "http://51.158.123.35:8811",
+}
+
+session = requests.Session()
+session.proxies.update(proxies)
+
+YouTubeTranscriptApi._requests_session = session
 
 
 app = FastAPI()
@@ -38,7 +49,10 @@ async def get_transcript(video: VideoURL):
         video_id = extract_video_id(video.url)
         logger.info(f"Fetching transcript for video: {video_id}")
 
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
+        transcript = YouTubeTranscriptApi.get_transcript(
+            video_id,
+            languages=["en"],
+        )
 
         formatter = JSONFormatter()
         formatted_text = formatter.format_transcript(transcript)
