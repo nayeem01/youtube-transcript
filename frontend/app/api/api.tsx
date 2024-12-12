@@ -1,6 +1,7 @@
 export const fetchTranscript = async (url: string) => {
+  const apiIP = process.env.API_IP;
   try {
-    const response = await fetch("http://127.0.0.1:8000/get-transcript/", {
+    const response = await fetch(`http://${apiIP}:8000/get-transcript/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
