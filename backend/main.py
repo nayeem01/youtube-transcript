@@ -3,24 +3,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import JSONFormatter
 from pydantic import BaseModel
-import requests
-
 import logging
+import requests
+import socks
 
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-proxies = {
-    "http": "http://51.158.123.35:8811",
-    "https": "http://51.158.123.35:8811",
+# SOCKS5 proxy configuration (replace with your SOCKS5 proxy)
+SOCKS_PROXY = "socks5h://qpoldsoi:brqx16r6ghyw@198.23.239.134:6540"  # Your SOCKS5 proxy
+
+# Custom proxy setup using requests
+session = requests.Session()
+session.proxies = {
+    "http": SOCKS_PROXY,
+    "https": SOCKS_PROXY,
 }
 
-session = requests.Session()
-session.proxies.update(proxies)
-
-YouTubeTranscriptApi._requests_session = session
-
-
+# FastAPI app setup
 app = FastAPI()
 
 app.add_middleware(
@@ -37,6 +38,7 @@ class VideoURL(BaseModel):
 
 
 def extract_video_id(url: str) -> str:
+    """Extract the YouTube video ID from a URL."""
     if "v=" not in url:
         raise ValueError("Invalid YouTube URL")
     video_id = url.split("v=")[1].split("&")[0]
@@ -45,19 +47,22 @@ def extract_video_id(url: str) -> str:
 
 @app.post("/get-transcript/")
 async def get_transcript(video: VideoURL):
+    """Fetch and return the transcript for the provided YouTube video URL."""
     try:
         video_id = extract_video_id(video.url)
         logger.info(f"Fetching transcript for video: {video_id}")
 
-        transcript = YouTubeTranscriptApi.get_transcript(
-            video_id,
-            languages=["en"],
-        )
+        # Set the session with SOCKS proxy for the request
+        YouTubeTranscriptApi.requests_session = session
 
+        # Fetch the transcript using the API with the SOCKS5 proxy
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
+
+        # Format the transcript to JSON
         formatter = JSONFormatter()
         formatted_text = formatter.format_transcript(transcript)
 
-        logger.error(f"text {formatted_text}")
+        logger.info(f"Successfully fetched transcript for {video_id}")
 
         return {"video_id": video_id, "transcript": formatted_text}
 

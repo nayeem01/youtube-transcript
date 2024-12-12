@@ -21,6 +21,7 @@ mdurl==0.1.2
 pydantic==2.10.3
 pydantic_core==2.27.1
 Pygments==2.18.0
+PySocks==1.7.1
 python-dotenv==1.0.1
 python-multipart==0.0.19
 PyYAML==6.0.2
@@ -36,4 +37,4 @@ urllib3==2.2.3
 uvicorn==0.32.1
 watchfiles==1.0.0
 websockets==14.1
-youtube-transcript-api==0.6.2
+youtube-transcript-api==0.6.3
