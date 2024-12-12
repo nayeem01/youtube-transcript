@@ -4,11 +4,17 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import JSONFormatter
 from pydantic import BaseModel
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://52.66.250.206"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["POST"],
     allow_headers=["*"],
@@ -30,17 +36,22 @@ def extract_video_id(url: str) -> str:
 async def get_transcript(video: VideoURL):
     try:
         video_id = extract_video_id(video.url)
+        logger.info(f"Fetching transcript for video: {video_id}")
 
         transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 
         formatter = JSONFormatter()
         formatted_text = formatter.format_transcript(transcript)
 
+        logger.error(f"text {formatted_text}")
+
         return {"video_id": video_id, "transcript": formatted_text}
 
     except ValueError as ve:
+        logger.error(f"Invalid URL: {ve}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        logger.error(f"Error fetching transcript for {video.url}: {str(e)}")
         raise HTTPException(
             status_code=500, detail="Error fetching transcript: " + str(e)
         )
