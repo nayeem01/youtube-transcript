@@ -6,14 +6,23 @@ from pydantic import BaseModel
 import logging
 import requests
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+http_proxy = os.getenv("HTTP_PROXY")
+https_proxy = os.getenv("HTTPS_PROXY")
+
 proxy = {
-    "http": "http://qpoldsoi:brqx16r6ghyw@173.0.9.70:5653",
-    "https": "http://qpoldsoi:brqx16r6ghyw@173.0.9.70:5653",
+    "http": http_proxy,
+    "https": https_proxy,
 }
+
+print(f"Using proxy: {proxy}")
 
 session = requests.Session()
 session.proxies = proxy
