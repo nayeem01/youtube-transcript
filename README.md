@@ -1,3 +1,3 @@
 # youtube-transcript
 
-AWS EC2: http://52.66.250.206/
+AWS EC2: http://15.207.21.86/

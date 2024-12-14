@@ -22,7 +22,6 @@ proxy = {
     "https": https_proxy,
 }
 
-print(f"Using proxy: {proxy}")
 
 session = requests.Session()
 session.proxies = proxy
@@ -32,7 +31,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["localhost:3000", "15.207.21.86"],
     allow_credentials=True,
     allow_methods=["POST"],
     allow_headers=["*"],
