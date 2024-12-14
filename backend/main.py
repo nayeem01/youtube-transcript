@@ -32,7 +32,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "http://15.207.21.86:8000",
+        "http://15.207.21.86",
     ],
     allow_credentials=True,
     allow_methods=["POST"],
